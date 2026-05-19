@@ -37,6 +37,21 @@ const hasVerses = stanzas.length > 0;
 const hasProse = (h?.prose.fa.length ?? 0) > 0;
 const hasEnglish = !!h?.prose.en && h.prose.en.length > 0;
 
+// If this entry has no verses and no highlight, treat it as a SECTION header.
+// Surface the stories that belong to this section (until the next section marker)
+// as a small in-page index.
+const allSources = loadAllSources();
+const myIdx = allSources.findIndex((s) => s.id === source.id);
+const isSectionHead = !hasVerses && !hasProse;
+let sectionChildren: { id: string; title: string }[] = [];
+if (isSectionHead && myIdx >= 0) {
+  for (let i = myIdx + 1; i < allSources.length; i++) {
+    const next = allSources[i];
+    if (next.versesFa.trim().length === 0) break;
+    sectionChildren.push({ id: next.id, title: next.rawTitle });
+  }
+}
+
 function applyEmphasis(s: string): string {
   return s.replace(
     /\*([^*]+)\*/g,
@@ -152,7 +167,28 @@ function applyEmphasis(s: string): string {
       </article>
     )}
 
-    {!hasVerses && !hasProse && (
+    {isSectionHead && sectionChildren.length > 0 && (
+      <article class="card section-card">
+        <p class="section-intro">
+          این عنوان، آغازِ بخشِ
+          <b>«{titleFa}»</b>
+          از شاهنامه است. داستان‌های این بخش:
+        </p>
+        <ol class="children">
+          {sectionChildren.map((c) => (
+            <li>
+              <a href={u(`/stories/${c.id}`)}>
+                <span class="cnum">{c.id}</span>
+                <span class="ctitle">{c.title}</span>
+                <span class="carrow" aria-hidden="true">←</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </article>
+    )}
+
+    {isSectionHead && sectionChildren.length === 0 && (
       <article class="card" style="text-align: center;">
         <p style="color: var(--ink-faint); font-family: 'Amiri', serif;">
           این بخش از کتاب در نسخه‌ی ما تنها به‌عنوان عنوان آمده است.
@@ -409,6 +445,45 @@ function applyEmphasis(s: string): string {
     }
 
     .verse-panel.no-tabs { margin-top: 48px; }
+
+    .section-card { margin-top: 48px; }
+    .section-intro {
+      font-family: "Amiri", serif;
+      font-size: 18px;
+      color: var(--ink-dim);
+      line-height: 2;
+      text-align: center;
+      margin: 0 0 28px;
+    }
+    .section-intro b { color: var(--gold); font-weight: 700; }
+    .children {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-width: 640px;
+      margin-inline: auto;
+    }
+    .children li { border-bottom: 1px solid rgba(212, 166, 74, 0.1); }
+    .children a {
+      display: grid;
+      grid-template-columns: 48px 1fr 24px;
+      gap: 16px;
+      align-items: center;
+      padding: 12px 14px;
+      color: var(--ink);
+      text-decoration: none;
+      transition: background .2s, color .2s;
+    }
+    .children a:hover { background: rgba(212, 166, 74, 0.05); color: var(--gold-bright); }
+    .cnum {
+      font-family: "Vazirmatn", sans-serif;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      color: var(--ink-faint);
+      text-align: center;
+    }
+    .ctitle { font-family: "Amiri", serif; font-size: 17px; }
+    .carrow { color: var(--gold); text-align: center; }
 
     .stanza {
       display: grid;
