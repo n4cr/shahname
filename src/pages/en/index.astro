@@ -1,0 +1,535 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+
+const stories = (await getCollection("stories")).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const featured = stories[0];
+---
+
+<Base
+  title="Shahnameh — The Persian Book of Kings, by Ferdowsi"
+  description="The great Persian epic by Hakim Abolqasem Ferdowsi — original verse alongside an accessible retelling, in Persian and English."
+  lang="en"
+  altLangHref="/"
+>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-portrait">
+      <figure>
+        <img
+          src="/images/cover-ferdowsi-ref.png"
+          alt="A painted portrait of the great Persian epic poet in classical miniature style"
+        />
+      </figure>
+    </div>
+
+    <div class="hero-text">
+      <div class="kicker">THE EPIC OF IRAN</div>
+      <h1 class="title">Shahnameh</h1>
+      <div class="author">
+        Hakim Abolqasem Ferdowsi of Tus
+        <small>c. 940 – 1020 CE</small>
+      </div>
+
+      <div class="ornament-divider" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2">
+          <polygon
+            points="32,2 39,18 56,18 44,30 50,46 32,38 14,46 20,30 8,18 25,18"
+            fill="rgba(212,166,74,0.08)"
+          />
+          <circle cx="32" cy="32" r="3" fill="currentColor" />
+        </svg>
+      </div>
+
+      <p class="invocation">
+        <span class="beyt">In the name of the Lord of soul and wisdom,</span>
+        <span class="beyt">Beyond whom thought cannot pass.</span>
+        <span class="src">The opening of the Shahnameh</span>
+      </p>
+
+      <a class="cta" href="#stories">
+        Begin reading
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+          <path d="M12 5v14M5 12l7 7 7-7" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </a>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true">FROM THE BOOK</div>
+  </section>
+
+  <section class="prelude reveal">
+    <div class="small-kicker">ABOUT THIS BOOK</div>
+    <p>
+      The Shahnameh — Ferdowsi's thirty-year labor — is the greatest epic of
+      Persian literature. In fifty thousand couplets it tells the story of
+      Iran and its people: kings and heroes, demons and lovers, wisdom and
+      destiny, from the dawn of the world to the fall of the Sasanian Empire.
+      It is the book that kept the Persian language alive.
+    </p>
+    <div class="stats">
+      <div class="stat"><b>50,000</b><span>couplets</span></div>
+      <div class="stat"><b>30</b><span>years of work</span></div>
+      <div class="stat"><b>1</b><span>civilization</span></div>
+    </div>
+  </section>
+
+  <section id="stories" class="stories reveal">
+    <div class="stories-head">
+      <div class="small-kicker">FROM THE STORIES</div>
+      <h2>Selected Tales</h2>
+    </div>
+
+    <div class="story-grid">
+      {featured && (
+        <a class="story-card" href={`/en/stories/${featured.data.slug}`}>
+          {featured.data.hero && (
+            <div class="card-image">
+              <img src={featured.data.hero.src} alt={featured.data.hero.alt.en} loading="lazy" />
+            </div>
+          )}
+          <div class="card-body">
+            <div class="card-chapter">{featured.data.chapter.en.toUpperCase()}</div>
+            <h3 class="card-title">{featured.data.title.en}</h3>
+            <div class="card-subtitle">{featured.data.subtitle.en}</div>
+            <p class="card-tease">{featured.data.prose.en[0]?.slice(0, 200) + "…"}</p>
+            <span class="card-read">
+              Read the story
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+                <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </a>
+      )}
+      <div class="story-card empty" aria-hidden="true">More stories — coming soon</div>
+      <div class="story-card empty" aria-hidden="true">More stories — coming soon</div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="colophon">In memory of Ferdowsi, who kept the Persian tongue alive</div>
+    <div class="colophon-quote">
+      "Much have I labored these thirty years &nbsp;•&nbsp; To revive the Persian with this verse"
+    </div>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add("visible");
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold: 0.12 },
+    );
+    document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+  </script>
+
+  <style>
+    .hero {
+      min-height: 100vh;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 56px 28px 80px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: clamp(40px, 6vw, 96px);
+      align-items: center;
+    }
+    .hero-portrait { animation: fadeUp 1.6s ease-out both; position: relative; }
+    .hero-portrait::before {
+      content: "";
+      position: absolute;
+      inset: -20%;
+      background: radial-gradient(circle at 30% 70%, rgba(212, 166, 74, 0.25), transparent 55%);
+      filter: blur(40px);
+      z-index: -1;
+      animation: ember 9s ease-in-out infinite;
+    }
+    @keyframes ember {
+      0%, 100% { opacity: 0.55; transform: scale(1); }
+      50%      { opacity: 0.95; transform: scale(1.05); }
+    }
+    .hero-portrait figure {
+      margin: 0;
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(180deg, rgba(212, 166, 74, 0.24), rgba(212, 166, 74, 0.05));
+      border: 1px solid rgba(212, 166, 74, 0.42);
+      position: relative;
+      box-shadow:
+        0 0 0 1px rgba(212, 166, 74, 0.12) inset,
+        0 50px 100px rgba(0, 0, 0, 0.7),
+        0 0 90px rgba(212, 166, 74, 0.18);
+    }
+    .hero-portrait figure::before,
+    .hero-portrait figure::after {
+      content: "";
+      position: absolute;
+      width: 22px; height: 22px;
+      border: 1px solid var(--gold);
+      opacity: 0.85;
+    }
+    .hero-portrait figure::before { top: -1px; left: -1px; border-bottom: none; border-right: none; }
+    .hero-portrait figure::after  { bottom: -1px; right: -1px; border-top: none; border-left: none; }
+    .hero-portrait img { display: block; width: 100%; height: auto; }
+
+    .hero-text { animation: fadeUp 1.8s ease-out 0.2s both; }
+    .kicker {
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.4em;
+      color: var(--ink-faint);
+      font-weight: 500;
+      margin-bottom: 28px;
+    }
+    .title {
+      font-family: Georgia, "Iowan Old Style", serif;
+      font-style: italic;
+      font-size: clamp(48px, 6.4vw, 96px);
+      font-weight: 400;
+      color: var(--gold);
+      line-height: 1.05;
+      margin: 0;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      text-shadow:
+        0 0 32px rgba(212, 166, 74, 0.32),
+        0 0 80px rgba(212, 166, 74, 0.18),
+        0 2px 0 #5a3f10;
+      animation: titleGlow 6s ease-in-out infinite;
+    }
+    @keyframes titleGlow {
+      0%, 100% {
+        text-shadow:
+          0 0 32px rgba(212, 166, 74, 0.32),
+          0 0 80px rgba(212, 166, 74, 0.18),
+          0 2px 0 #5a3f10;
+      }
+      50% {
+        text-shadow:
+          0 0 48px rgba(232, 192, 113, 0.5),
+          0 0 120px rgba(212, 166, 74, 0.28),
+          0 2px 0 #5a3f10;
+      }
+    }
+    .author {
+      margin-top: 28px;
+      font-family: Georgia, serif;
+      font-size: clamp(18px, 2vw, 24px);
+      color: var(--ink-dim);
+      font-style: italic;
+    }
+    .author small {
+      display: block;
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 12px;
+      color: var(--ink-faint);
+      letter-spacing: 0.3em;
+      margin-top: 8px;
+      font-style: normal;
+    }
+    .ornament-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 36px 0 32px;
+      color: var(--gold);
+      max-width: 380px;
+    }
+    .ornament-divider::before,
+    .ornament-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to var(--side, right), transparent, var(--rule));
+    }
+    .ornament-divider::after { --side: left; }
+    .ornament-divider svg { width: 26px; height: 26px; filter: drop-shadow(0 0 6px rgba(212, 166, 74, 0.5)); }
+
+    .invocation {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: clamp(20px, 2.2vw, 26px);
+      color: var(--ink);
+      line-height: 1.7;
+      margin: 0 0 12px;
+    }
+    .invocation .beyt { display: block; }
+    .invocation .src {
+      display: block;
+      margin-top: 14px;
+      font-style: normal;
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--ink-faint);
+    }
+    .cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 36px;
+      padding: 14px 32px;
+      background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+      color: #1a1208;
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 999px;
+      box-shadow:
+        0 0 0 1px rgba(255, 220, 150, 0.4) inset,
+        0 12px 30px rgba(212, 166, 74, 0.3);
+      transition: transform .3s, box-shadow .3s, background .3s;
+    }
+    .cta:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    }
+    .cta svg { transition: transform .3s; }
+    .cta:hover svg { transform: translateY(3px); }
+
+    .scroll-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      color: var(--ink-faint);
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      opacity: 0;
+      animation: fadeIn 2s ease 2.2s forwards, bob 2.4s ease-in-out 3s infinite;
+      text-align: center;
+    }
+    .scroll-hint::after {
+      content: "↓";
+      display: block;
+      margin-top: 6px;
+      font-size: 16px;
+      color: var(--gold);
+    }
+    @keyframes bob {
+      0%, 100% { transform: translate(-50%, 0); }
+      50%      { transform: translate(-50%, 6px); }
+    }
+
+    .prelude {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 120px 28px;
+      text-align: center;
+    }
+    .prelude .small-kicker,
+    .stories-head .small-kicker {
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.35em;
+      color: var(--gold-deep);
+      margin-bottom: 24px;
+      font-weight: 500;
+    }
+    .prelude p {
+      font-family: Georgia, serif;
+      font-size: clamp(17px, 1.6vw, 20px);
+      line-height: 1.8;
+      color: var(--ink-dim);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin: 64px auto 0;
+      max-width: 600px;
+    }
+    .stat {
+      text-align: center;
+      padding: 22px 8px;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+    }
+    .stat b {
+      display: block;
+      font-family: "Gulzar", serif;
+      font-size: clamp(28px, 3.6vw, 44px);
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 10px;
+      font-weight: 400;
+    }
+    .stat span {
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: var(--ink-faint);
+      text-transform: uppercase;
+    }
+
+    .stories {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 28px 80px;
+    }
+    .stories-head { text-align: center; margin-bottom: 56px; }
+    .stories-head h2 {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(36px, 4.5vw, 56px);
+      color: var(--gold);
+      margin: 0;
+    }
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+    }
+    .story-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: linear-gradient(180deg, rgba(26, 29, 46, 0.7), rgba(20, 24, 42, 0.9));
+      border: 1px solid rgba(212, 166, 74, 0.2);
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: transform .35s, border-color .35s, box-shadow .35s;
+    }
+    .story-card::before,
+    .story-card::after {
+      content: "";
+      position: absolute;
+      width: 16px; height: 16px;
+      border: 1px solid var(--gold);
+      opacity: 0;
+      transition: opacity .35s;
+    }
+    .story-card::before { top: 6px; left: 6px; border-bottom: none; border-right: none; }
+    .story-card::after  { bottom: 6px; right: 6px; border-top: none; border-left: none; }
+    .story-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), 0 0 60px rgba(212, 166, 74, 0.15);
+    }
+    .story-card:hover::before,
+    .story-card:hover::after { opacity: 0.85; }
+    .card-image { overflow: hidden; margin-bottom: 22px; aspect-ratio: 3 / 2; background: var(--night-2); }
+    .card-image img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 1s; }
+    .story-card:hover .card-image img { transform: scale(1.06); }
+    .card-body { padding: 6px 12px 16px; }
+    .card-chapter {
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--gold-deep);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .card-title {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 30px;
+      color: var(--gold);
+      margin: 0;
+      line-height: 1.2;
+    }
+    .card-subtitle {
+      font-family: Georgia, serif;
+      font-size: 15px;
+      color: var(--ink-dim);
+      margin: 6px 0 14px;
+    }
+    .card-tease {
+      font-family: Georgia, serif;
+      font-size: 14.5px;
+      color: var(--ink-dim);
+      line-height: 1.7;
+      margin: 0 0 20px;
+    }
+    .card-read {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 12px;
+      color: var(--gold);
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .card-read svg { transition: transform .3s; }
+    .story-card:hover .card-read svg { transform: translateX(4px); }
+    .story-card.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 360px;
+      border: 1px dashed rgba(212, 166, 74, 0.25);
+      background: transparent;
+      color: var(--ink-faint);
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 16px;
+    }
+    .story-card.empty:hover { transform: none; border-color: rgba(212, 166, 74, 0.4); box-shadow: none; }
+
+    footer {
+      text-align: center;
+      padding: 64px 28px 56px;
+      color: var(--ink-faint);
+      font-size: 13px;
+      line-height: 1.8;
+      border-top: 1px solid rgba(212, 166, 74, 0.12);
+      margin-top: 40px;
+    }
+    .colophon {
+      font-family: Georgia, serif;
+      color: var(--ink-dim);
+      font-size: 17px;
+      margin-bottom: 10px;
+    }
+    .colophon-quote {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+      color: var(--ink-faint);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 1s, transform 1s;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @media (max-width: 880px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding: 36px 20px 56px;
+      }
+      .hero-portrait { max-width: 360px; margin: 0 auto; order: -1; }
+      .hero-text { text-align: center; }
+      .ornament-divider { margin-left: auto; margin-right: auto; }
+      .scroll-hint { display: none; }
+      .prelude { padding: 80px 20px; }
+      .stories { padding: 0 20px 60px; }
+    }
+  </style>
+</Base>

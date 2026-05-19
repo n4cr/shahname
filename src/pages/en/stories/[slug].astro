@@ -1,0 +1,437 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Base from "../../../layouts/Base.astro";
+import { parseVerses } from "../../../lib/poem";
+
+export async function getStaticPaths() {
+  const stories = await getCollection("stories");
+  return stories.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<"stories">;
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const stanzas = parseVerses(d.versesFa);
+
+function applyEmphasis(s: string): string {
+  return s.replace(
+    /\*([^*]+)\*/g,
+    (_, t) => `<em class="em">${t}</em>`,
+  );
+}
+---
+
+<Base
+  title={`${d.title.en} — Shahnameh`}
+  description={d.subtitle.en}
+  lang="en"
+  altLangHref={`/stories/${d.slug}`}
+>
+  <div class="page">
+    <nav class="top-nav" aria-label="Navigation">
+      <a class="back" href="/en">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="14" height="14" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>Shahnameh</span>
+      </a>
+      <span class="crumb-sep" aria-hidden="true">·</span>
+      <span class="crumb-author">Ferdowsi of Tus</span>
+    </nav>
+
+    <section class="story-head">
+      <div class="chapter-num">{d.chapter.en.toUpperCase()}</div>
+      <h1 class="story-title">{d.title.en}</h1>
+      <div class="story-subtitle">{d.subtitle.en}</div>
+    </section>
+
+    {d.hero && (
+      <figure class="illumination">
+        <img src={d.hero.src} alt={d.hero.alt.en} loading="lazy" />
+        <figcaption>{d.hero.caption.en}</figcaption>
+      </figure>
+    )}
+
+    <div class="view-switch" role="tablist">
+      <button type="button" data-view="story" class="is-active" role="tab" aria-selected="true">Story</button>
+      <button type="button" data-view="verse" role="tab" aria-selected="false">Original Verse</button>
+      <button type="button" data-view="persian" role="tab" aria-selected="false">فارسی</button>
+    </div>
+
+    <!-- STORY (English narrative) -->
+    <article class="panel is-active card" id="panel-story" role="tabpanel">
+      <div class="prose en">
+        {d.prose.en.map((p, i) =>
+          p === "::quote::" && d.pullQuote ? (
+            <div class="pull">{d.pullQuote.en}</div>
+          ) : (
+            <p class={i === 0 ? "lead" : ""} set:html={applyEmphasis(p)} />
+          ),
+        )}
+      </div>
+    </article>
+
+    <!-- PERSIAN narrative -->
+    <article class="panel card" id="panel-persian" lang="fa" dir="rtl" role="tabpanel" hidden>
+      {d.cast.length > 0 && (
+        <div class="cast">
+          <h3>چهره‌های داستان</h3>
+          <dl>
+            {d.cast.map((c) => (
+              <>
+                <dt>{c.fa}</dt>
+                <dd>{c.roleFa}</dd>
+              </>
+            ))}
+          </dl>
+        </div>
+      )}
+      <div class="prose fa">
+        {d.prose.fa.map((p, i) =>
+          p === "::quote::" && d.pullQuote ? (
+            <div class="pull">{d.pullQuote.fa}</div>
+          ) : (
+            <p class={i === 0 ? "lead" : ""} set:html={applyEmphasis(p)} />
+          ),
+        )}
+      </div>
+    </article>
+
+    <!-- VERSE -->
+    <article class="panel card" id="panel-verse" lang="fa" dir="rtl" role="tabpanel" hidden>
+      {stanzas.map((st, i) => (
+        <>
+          {i > 0 && <div class="section-break" aria-hidden="true">❖</div>}
+          <div class="stanza">
+            {st.couplets.map((c) => (
+              <>
+                <p class="mesra first">{c.first}</p>
+                <p class="mesra second">{c.second}</p>
+              </>
+            ))}
+          </div>
+        </>
+      ))}
+    </article>
+
+    <footer>
+      <div class="colophon">In memory of Ferdowsi, who kept the Persian tongue alive</div>
+      <div class="colophon-quote">
+        "Much have I labored these thirty years &nbsp;•&nbsp; To revive the Persian with this verse"
+      </div>
+    </footer>
+  </div>
+
+  <script is:inline>
+    (function () {
+      const buttons = document.querySelectorAll(".view-switch button[data-view]");
+      const panels = {
+        story: document.getElementById("panel-story"),
+        verse: document.getElementById("panel-verse"),
+        persian: document.getElementById("panel-persian"),
+      };
+      function activate(view) {
+        buttons.forEach(function (b) {
+          const on = b.dataset.view === view;
+          b.classList.toggle("is-active", on);
+          b.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        Object.keys(panels).forEach(function (key) {
+          const el = panels[key];
+          if (!el) return;
+          const on = key === view;
+          el.classList.toggle("is-active", on);
+          if (on) el.removeAttribute("hidden");
+          else el.setAttribute("hidden", "");
+        });
+        try { history.replaceState(null, "", "#" + view); } catch (e) {}
+      }
+      buttons.forEach(function (b) {
+        b.addEventListener("click", function () { activate(b.dataset.view); });
+      });
+      const initial = (location.hash || "").replace("#", "");
+      if (initial in panels) activate(initial);
+    })();
+  </script>
+
+  <style>
+    .page { max-width: 880px; margin: 0 auto; padding: 60px 24px 120px; }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      margin-bottom: 24px;
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 12px;
+      color: var(--ink-faint);
+      letter-spacing: 0.05em;
+    }
+    .top-nav .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-dim);
+      text-decoration: none;
+      padding: 6px 12px;
+      border: 1px solid rgba(212, 166, 74, 0.25);
+      border-radius: 999px;
+      font-family: Georgia, serif;
+      font-style: italic;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+    .top-nav .back:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+      background: rgba(212, 166, 74, 0.08);
+    }
+    .top-nav .crumb-author { font-family: Georgia, serif; font-style: italic; }
+
+    .story-head { text-align: center; padding: 24px 0 8px; }
+    .chapter-num {
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 11px;
+      color: var(--gold-deep);
+      letter-spacing: 0.3em;
+      font-weight: 500;
+    }
+    .story-title {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: clamp(40px, 5.5vw, 60px);
+      color: var(--gold);
+      margin: 8px 0 0;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+    .story-subtitle {
+      font-family: Georgia, serif;
+      color: var(--ink-dim);
+      font-size: 19px;
+      margin-top: 14px;
+    }
+
+    .illumination {
+      margin: 48px auto 0;
+      max-width: 760px;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(212, 166, 74, 0.18), rgba(212, 166, 74, 0.05));
+      border: 1px solid rgba(212, 166, 74, 0.35);
+      box-shadow: 0 0 0 1px rgba(212, 166, 74, 0.05) inset, 0 30px 80px rgba(0, 0, 0, 0.55);
+      position: relative;
+    }
+    .illumination::before,
+    .illumination::after {
+      content: "";
+      position: absolute;
+      width: 22px; height: 22px;
+      border: 1px solid var(--gold);
+      opacity: 0.7;
+    }
+    .illumination::before { top: -1px; left: -1px; border-bottom: none; border-right: none; }
+    .illumination::after  { bottom: -1px; right: -1px; border-top: none; border-left: none; }
+    .illumination img { display: block; width: 100%; height: auto; }
+    .illumination figcaption {
+      margin-top: 12px;
+      text-align: center;
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 14px;
+      color: var(--ink-faint);
+    }
+
+    .view-switch {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin: 48px auto 0;
+      padding: 6px;
+      background: rgba(20, 24, 42, 0.7);
+      border: 1px solid rgba(212, 166, 74, 0.2);
+      border-radius: 999px;
+      width: fit-content;
+    }
+    .view-switch button {
+      background: transparent;
+      border: none;
+      color: var(--ink-dim);
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px 22px;
+      border-radius: 999px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: color .25s, background .25s;
+    }
+    .view-switch button:hover { color: var(--ink); }
+    .view-switch button.is-active {
+      background: linear-gradient(180deg, var(--gold), var(--gold-deep));
+      color: #1a1208;
+      box-shadow: 0 0 18px rgba(212, 166, 74, 0.35);
+    }
+
+    .panel { display: none; }
+    .panel.is-active { display: block; }
+
+    .card {
+      margin-top: 32px;
+      padding: 48px clamp(16px, 5vw, 72px);
+      background: linear-gradient(180deg, rgba(26, 29, 46, 0.6), rgba(20, 24, 42, 0.85));
+      border: 1px solid rgba(212, 166, 74, 0.18);
+      box-shadow: 0 0 0 1px rgba(212, 166, 74, 0.05) inset, 0 20px 60px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+    .card::before,
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 36px; height: 36px;
+      border: 1px solid var(--gold-deep);
+      opacity: 0.6;
+    }
+    .card::before { top: 10px; left: 10px; border-bottom: none; border-right: none; }
+    .card::after  { bottom: 10px; right: 10px; border-top: none; border-left: none; }
+
+    .prose { line-height: 1.85; color: var(--ink); max-width: 68ch; margin: 0 auto; }
+    .prose.en { font-family: Georgia, serif; font-size: clamp(17px, 1.7vw, 19px); }
+    .prose.fa { font-family: "Vazirmatn", sans-serif; font-size: clamp(16px, 1.7vw, 19px); line-height: 2.1; }
+    .prose p { margin: 0 0 1.2em; text-align: justify; }
+    .prose .lead { font-size: 1.08em; }
+    .prose.en .lead::first-letter {
+      font-family: Georgia, serif;
+      font-size: 2.8em;
+      line-height: 0.85;
+      color: var(--gold);
+      float: left;
+      margin-right: 10px;
+      padding-top: 6px;
+    }
+    .prose.fa .lead::first-letter {
+      font-family: "Gulzar", serif;
+      font-size: 2.6em;
+      line-height: 0.9;
+      color: var(--gold);
+      float: right;
+      margin-left: 8px;
+      padding-left: 4px;
+    }
+    .prose :global(.em) { color: var(--gold); font-style: normal; font-weight: 600; }
+    .pull {
+      margin: 32px 0;
+      padding: 18px 26px;
+      border-inline-start: 2px solid var(--gold-deep);
+      color: var(--ink);
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 1.2em;
+      line-height: 1.8;
+      background: rgba(212, 166, 74, 0.04);
+    }
+    .prose.fa + * .pull,
+    .prose.fa .pull { font-family: "Amiri", serif; font-style: normal; }
+
+    .cast {
+      margin: 0 0 28px;
+      padding: 20px 24px;
+      border: 1px dashed rgba(212, 166, 74, 0.25);
+      background: rgba(13, 15, 26, 0.4);
+    }
+    .cast h3 {
+      margin: 0 0 12px;
+      font-family: "Amiri", serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--gold);
+    }
+    .cast dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      column-gap: 18px;
+      row-gap: 6px;
+      font-size: 15px;
+    }
+    .cast dt { color: var(--gold-deep); font-weight: 600; }
+    .cast dd { margin: 0; color: var(--ink-dim); }
+
+    .stanza {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: clamp(20px, 5vw, 64px);
+      row-gap: 6px;
+      margin-bottom: 36px;
+      position: relative;
+    }
+    .stanza::before {
+      content: "";
+      position: absolute;
+      top: 4px; bottom: 4px;
+      right: 50%;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(212, 166, 74, 0.15) 15%, rgba(212, 166, 74, 0.15) 85%, transparent);
+      transform: translateX(50%);
+    }
+    .mesra {
+      font-family: "Amiri", serif;
+      font-size: clamp(20px, 2.2vw, 26px);
+      color: var(--ink);
+      line-height: 2;
+      padding: 2px 6px;
+    }
+    .mesra.first { text-align: justify; padding-left: 18px; }
+    .mesra.second { text-align: justify; padding-right: 18px; }
+    .section-break {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 28px 0 40px;
+      color: var(--gold);
+      opacity: 0.7;
+    }
+    .section-break::before,
+    .section-break::after {
+      content: "";
+      width: 60px;
+      height: 1px;
+      background: var(--rule);
+      margin: 0 14px;
+    }
+
+    footer {
+      margin-top: 80px;
+      text-align: center;
+      color: var(--ink-faint);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    footer .colophon {
+      font-family: Georgia, serif;
+      color: var(--ink-dim);
+      font-size: 17px;
+      margin-bottom: 10px;
+    }
+    footer .colophon-quote {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 15px;
+    }
+
+    @media (max-width: 640px) {
+      .page { padding: 32px 12px 80px; }
+      .card { padding: 32px 16px; }
+      .stanza { grid-template-columns: 1fr; row-gap: 0; }
+      .stanza::before { display: none; }
+      .mesra.first, .mesra.second { padding: 0; text-align: right; }
+      .mesra.first { padding-bottom: 4px; }
+      .mesra.second { padding-bottom: 12px; color: var(--ink-dim); }
+    }
+  </style>
+</Base>

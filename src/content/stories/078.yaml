@@ -1,0 +1,122 @@
+id: "078"
+slug: "rostam-zad"
+order: 78
+
+chapter:
+  num: 78
+  fa: "داستان هفتاد و هشتم"
+  en: "Chapter Seventy-Eight"
+
+title:
+  fa: "رستم‌زاد"
+  en: "The Birth of Rostam"
+
+subtitle:
+  fa: "زادنِ تهمتنِ پیل‌تن از مادر"
+  en: "The Birth of the Mighty One from his Mother"
+
+hero:
+  src: "/images/078-rostamzad-v2.png"
+  alt:
+    fa: "رودابه نوزاد رستم را در آغوش گرفته و سیمرغ از فراز بر آنان سایه افکنده — نگارگری ایرانی"
+    en: "Rudabe cradles the newborn Rostam as the Simorgh spreads her wings overhead — Persian miniature illumination"
+  caption:
+    fa: "رودابه و نوزادِ تهمتن در بزمِ زاولستان"
+    en: "Rudabe and the infant Rostam at the feast in Zabulestan"
+
+cast:
+  - fa: "زال"
+    en: "Zal"
+    roleFa: "پدرِ رستم؛ پسرِ سامِ پهلوان که در کودکی سیمرغ او را پرورده بود."
+    roleEn: "Father of Rostam; son of Sam the hero, raised by the Simorgh as a child."
+  - fa: "رودابه"
+    en: "Rudabe"
+    roleFa: "مادرِ رستم؛ دختر مهراب، شاهِ کابل."
+    roleEn: "Mother of Rostam; daughter of Mehrab, king of Kabul."
+  - fa: "سام"
+    en: "Sam"
+    roleFa: "پدربزرگِ رستم؛ نام‌دارترین پهلوانِ زاولستان."
+    roleEn: "Rostam's grandfather; the most celebrated hero of Zabulestan."
+  - fa: "سیمرغ"
+    en: "Simorgh"
+    roleFa: "مرغِ خردمندِ افسانه‌ای که زال را در کوهِ البرز بزرگ کرده بود."
+    roleEn: "The mythic, wise bird who had raised Zal on Mount Alborz."
+  - fa: "رستم"
+    en: "Rostam"
+    roleFa: "قهرمانِ این داستان؛ بزرگ‌ترین پهلوانِ شاهنامه."
+    roleEn: "Hero of this story; the greatest champion of the Shahnameh."
+
+pullQuote:
+  fa: "«بخندید ازان بچه سرو سهی  •  بدید اندرو فرِّ شاهنشهی»"
+  en: "She laughed at the boy, that slender cypress, and saw upon him the glory of kings."
+
+prose:
+  fa:
+    - "رودابه، دخترِ شاهِ کابل و همسرِ زال، روزهای دشواری را می‌گذراند. کودکی که در بطن داشت چنان بزرگ و پرتوان بود که زایمانِ طبیعی او را به مرزِ مرگ کشانده بود. زال نومید نشد؛ پرِ سیمرغ را که از کودکی نزد خود نگاه داشته بود به آتش زد، و آن مرغِ خردمند بر بالای سرش پدیدار شد."
+    - "سیمرغ گفت: «موبدی چرب‌دست بیاور و رودابه را با می چنان مست کن که هیچ دردی حس نکند. آنگاه پهلویش را با مهارت بشکاف، فرزند را بیرون آور، و باز جای بریدگی را بدوز.» چنان شد. کودک — پسری به بلندیِ شیر، با چهره‌ای درخشان — بی‌گزند به دنیا آمد، و در جهان کسی چنین شگفتی ندیده بود."
+    - "مادر یک شبانه‌روز در خوابِ مِی ماند. چون به هوش آمد و نوزاد را بر سینه گرفت، لبخند زد و گفت: *«بِرَستم»* — یعنی از رنج رهیدم — و از همان دم نامِ پسر را «رستم» نهادند."
+    - "::quote::"
+    - "تا این خبر را به نیای پهلوان، سامِ سوار، برسانند، پیکره‌ای از حریر به اندازه‌ی کودک ساختند. درونش را با موی سمور انباشتند، چهره‌اش را چون خورشید و ستاره‌ی ناهید نقش زدند، اژدهایی بر بازویش کشیدند و چنگالِ شیری در مشتش گذاشتند، گرز و سنان به دستش دادند، و آن پیکرِ شکوهمند را بر اسبی سَمَند نشاندند و با چاکران به درگاهِ سام فرستادند."
+    - "سام چون آن پیکر را دید از جای برخاست و گفت: «اگر تنِ این کودک حتی نیمی از این پیکر شود، سرش به ابرها خواهد سایید و دامنش زمین را خواهد پوشاند.» آنگاه جشنی برپا کرد که از زاولستان تا کابلستان دشت‌ها از باده و نوای نی پر شد، و خورشید و ماه به تماشای آن بزمگاه آمدند."
+    - "و رستم چنان رشد می‌کرد که گویی روزگار رازِ خود را برهنه کرده باشد. ده دایه به نوبت به او شیر می‌دادند، و چون از شیر گرفته شد، خوراکِ پنج مرد را می‌خورد و مردمان از پرورشِ او در شگفت می‌ماندند. در هشت‌سالگی چون سروی آزاد بلند ایستاد، چهره‌اش چون ستاره‌ای رخشان می‌درخشید، و در بالا و فرهنگ و رای، همانندِ نیای خود *سامِ یل* شده بود."
+  en:
+    - "Rudabe, daughter of the king of Kabul and wife of Zal, was dying in childbirth. The child growing inside her was simply too vast for the world to bring forth in any ordinary way. Refusing to despair, Zal burned a feather of the *Simorgh* — the mythical bird who had raised him on Mount Alborz as a boy — and she appeared at his side."
+    - "\"Bring a skilled healer,\" the Simorgh said. \"Steep your beloved in wine until she feels no pain, then open her side with care, lift the child free, and stitch the wound closed again.\" So it was done. A boy emerged — radiant, enormous, perfect — and no one alive had ever seen such a wonder."
+    - "For a full day and night the mother slept. When she woke at last and held the child to her, she smiled and whispered *rastam* — \"I am delivered.\" From that single word the boy took his name forever: *Rostam*."
+    - "::quote::"
+    - "To send word to the great patriarch *Sam*, they fashioned a silken effigy of the newborn — stuffed with sable fur, its face painted with the sun and the star Anahid, a dragon coiled along one arm, a lion's claw clenched in its fist, a mace in one hand and a lance in the other — and set the figure upon a swift golden horse with attendants riding alongside."
+    - "When Sam beheld the effigy he rose to his feet and said: \"If the boy grows to even half this size, his head will brush the clouds and his hem will sweep the earth.\" He held a feast that stretched from Zabulestan to Kabulestan, and it is said the sun and moon themselves came down to watch."
+    - "Rostam grew at a pace that left the world bare of secrets. Ten wet-nurses fed him in turn; once weaned he ate the food of five grown men, and people marveled at how he was raised. By the age of eight he stood like a free cypress, his face shone like a brilliant star, and in stature, wisdom, and bearing he was already the equal of his grandfather, *Sam the Hero*."
+
+versesFa: |
+  بیامد یکی موبدی چرب‌دست || مر آن ماه‌رخ را به می کرد مست
+  بکافید بی‌رنج پهلوی ماه || بتابید مر بچه را سر ز راه
+  چنان بی‌گزندش برون آورید || که کس در جهان این شگفتی ندید
+  یکی بچه بد چون گوی شیرفش || به بالا بلند و به دیدار کش
+  شگفت اندرو مانده بد مرد و زن || که نشنید کس بچه‌ی پیل‌تن
+  همان دردگاهش فرو دوختند || به داور همه درد بسپوختند
+  شبانروز مادر ز می خفته بود || ز می خفته و هش ازو رفته بود
+
+  چو از خواب بیدار شد سرو بن || به سیندخت بگشاد لب بر سخن
+  برو زر و گوهر برافشاندند || ابر کردگار آفرین خواندند
+  مر آن بچه را پیش او تاختند || بسان سپهری برافراختند
+  بخندید ازان بچه سرو سهی || بدید اندرو فر شاهنشهی
+  به رستم بگفتا غم آمد بسر || نهادند رستمش نام پسر
+  یکی کودکی دوختند از حریر || به بالای آن شیرِ ناخورده شیر
+  درون وی آگنده موی سمور || برخ بر نگاریده ناهید و هور
+  به بازوش بر اژدهای دلیر || به چنگ اندرش داده چنگال شیر
+  به زیر کش اندر گرفته سنان || به یک دست کوپال و دیگر عنان
+  نشاندندش آنگه بر اسپ سمند || به گرد اندرش چاکران نیز چند
+  چو شد کار یکسر همه ساخته || چنان چون ببایست پرداخته
+  هیون تکاور برانگیختند || به فرمان بران بر درم ریختند
+  پس آن صورت رستم گرزدار || ببردند نزدیک سام سوار
+  یکی جشن کردند در گلستان || ز زاولستان تا به کابلستان
+  همه دشت پر باده و نای بود || به هر کنج صد مجلس‌آرای بود
+  به زاولستان از کران تا کران || نشسته به هر جای رامشگران
+  نبد کهتر از مهتران بر فرود || نشسته چنان چون بود تار و پود
+  پس آن پیکر رستم شیرخوار || ببردند نزدیک سام سوار
+  ابر سام یل موی بر پای خاست || مرا ماند این پرنیان گفت راست
+  اگر نیم ازین پیکر آید تنش || سرش ابر ساید زمین دامنش
+  وزان پس فرستاده را پیش خواست || درم ریخت تا بر سرش گشت راست
+  به شادی برآمد ز درگاه کوس || بیاراست میدان چو چشم خروس
+  می آورد و رامشگران را بخواند || به خواهندگان بر درم برفشاند
+  بیاراست جشنی که خورشید و ماه || نظاره شدند اندران بزمگاه
+  پس آن نامه‌ی زال پاسخ نوشت || بیاراست چون مرغزار بهشت
+  نخست آفرین کرد بر کردگار || بران شادمان گردش روزگار
+  ستودن گرفت آنگهی زال را || خداوند شمشیر و کوپال را
+  پس آمد بدان پیکر پرنیان || که یال یالن داشت و فر کیان
+  بفرمود کین را چنین ارجمند || بدارید کز دم نیابد گزند
+
+  نیایش همی کردم اندر نهان || شب و روز با کردگار جهان
+  که زنده ببیند جهان‌بین من || ز تخم تو گردی به آیین من
+  کنون شد مرا و ترا پشت راست || نباید جز از زندگانیش خواست
+  فرستاده آمد چو باد دمان || بر زال روشن‌دل و شادمان
+  چو بشنید زال این سخنهای نغز || که روشن روان اندر آید به مغز
+  به شادیش بر شادمانی فزود || برافراخت گردن به چرخ کبود
+  همی گشت چندی بروبر جهان || برهنه شد آن روزگار نهان
+  به رستم همی داد ده دایه شیر || که نیروی مردست و سرمایه‌ی شیر
+  چو از شیر آمد سوی خوردنی || شد از نان و از گوشت افزودنی
+  بدی پنج مرده مراو را خورش || بماندند مردم ازان پرورش
+  چو رستم بپیمود بالای هشت || بسان یکی سرو آزاد گشت
+  چنان شد که رخشان ستاره شود || جهان بر ستاره نظاره شود
+  تو گفتی که سام یلستی به جای || به بالا و دیدار و فرهنگ و رای

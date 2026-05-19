@@ -1,0 +1,95 @@
+:root {
+  --ink:        #f3e3bf;
+  --ink-dim:    #c9b487;
+  --ink-faint:  #8a7752;
+  --gold:       #d4a64a;
+  --gold-bright:#e8c071;
+  --gold-deep:  #a77a25;
+  --crimson:    #8b1e2d;
+  --night:      #0d0f1a;
+  --night-2:    #14182a;
+  --parchment:  #1a1d2e;
+  --rule:       rgba(212, 166, 74, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--night);
+  color: var(--ink);
+  font-family: "Vazirmatn", system-ui, sans-serif;
+  line-height: 1.85;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,   rgba(122, 96, 42, 0.18), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(40, 30, 80, 0.32), transparent 70%),
+    radial-gradient(ellipse at center, #1b1f38 0%, #0d0f1a 55%, #050609 100%),
+    var(--night);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+html[lang="en"] body {
+  font-family: Georgia, "Iowan Old Style", "Source Serif Pro", serif;
+}
+
+/* Star field */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 18% 24%, rgba(212,166,74,0.55), transparent 50%),
+    radial-gradient(1px 1px at 72% 78%, rgba(212,166,74,0.35), transparent 50%),
+    radial-gradient(1px 1px at 45% 65%, rgba(255,255,255,0.28), transparent 50%),
+    radial-gradient(1px 1px at 88% 14%, rgba(212,166,74,0.4),  transparent 50%),
+    radial-gradient(1px 1px at  8% 86%, rgba(255,255,255,0.22), transparent 50%),
+    radial-gradient(1px 1px at 60% 38%, rgba(212,166,74,0.3),  transparent 50%),
+    radial-gradient(1.4px 1.4px at 32% 14%, rgba(255,255,255,0.5), transparent 50%),
+    radial-gradient(1.4px 1.4px at 80% 52%, rgba(212,166,74,0.6), transparent 50%);
+  background-size: 1400px 1400px;
+  z-index: 0;
+  animation: drift 240s linear infinite;
+}
+@keyframes drift {
+  from { background-position: 0 0; }
+  to   { background-position: -1400px -700px; }
+}
+
+/* Drifting gold dust */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 22% 30%, rgba(212, 166, 74, 0.10), transparent 60%),
+    radial-gradient(2.5px 2.5px at 70% 60%, rgba(212, 166, 74, 0.08), transparent 60%),
+    radial-gradient(3px 3px at 40% 80%, rgba(232, 192, 113, 0.07), transparent 60%);
+  background-size: 800px 800px;
+  animation: drift 90s linear infinite reverse;
+  z-index: 0;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+a { color: var(--gold); }
+a:hover { color: var(--gold-bright); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

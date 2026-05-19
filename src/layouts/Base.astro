@@ -1,0 +1,67 @@
+---
+import "../styles/global.css";
+
+export interface Props {
+  title: string;
+  description?: string;
+  lang?: "fa" | "en";
+  /** href to the same page in the OTHER language, for the language switcher */
+  altLangHref?: string;
+}
+
+const { title, description, lang = "fa", altLangHref } = Astro.props;
+const dir = lang === "fa" ? "rtl" : "ltr";
+const altLang = lang === "fa" ? "en" : "fa";
+const altLabel = altLang === "fa" ? "فارسی" : "English";
+---
+
+<!doctype html>
+<html lang={lang} dir={dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Gulzar&family=Vazirmatn:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    {altLangHref && (
+      <a class="lang-switch" href={altLangHref} hreflang={altLang} aria-label={`Switch to ${altLabel}`}>
+        {altLabel}
+      </a>
+    )}
+    <main>
+      <slot />
+    </main>
+
+    <style>
+      .lang-switch {
+        position: fixed;
+        top: 16px;
+        inset-inline-end: 18px;
+        z-index: 10;
+        padding: 7px 14px;
+        font-family: "Vazirmatn", sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        color: var(--ink-dim);
+        text-decoration: none;
+        border: 1px solid rgba(212, 166, 74, 0.3);
+        border-radius: 999px;
+        background: rgba(13, 15, 26, 0.6);
+        backdrop-filter: blur(6px);
+        transition: color .2s, border-color .2s, background .2s;
+      }
+      .lang-switch:hover {
+        color: var(--gold);
+        border-color: var(--gold);
+        background: rgba(212, 166, 74, 0.08);
+      }
+    </style>
+  </body>
+</html>
