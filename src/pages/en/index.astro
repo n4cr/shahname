@@ -50,12 +50,17 @@ const featured = stories[0];
         <span class="src">The opening of the Shahnameh</span>
       </p>
 
-      <a class="cta" href="#stories">
-        Begin reading
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
-          <path d="M12 5v14M5 12l7 7 7-7" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </a>
+      <div class="cta-row">
+        <a class="cta" href={u("/en/stories")}>
+          Full index
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="cta cta-ghost" href="#stories">
+          Selected tales
+        </a>
+      </div>
     </div>
 
     <div class="scroll-hint" aria-hidden="true">FROM THE BOOK</div>
@@ -107,17 +112,7 @@ const featured = stories[0];
           </div>
         </a>
       )}
-      <a class="story-card toc-card" href={u("/en/stories")}>
-        <div class="toc-icon" aria-hidden="true">📜</div>
-        <h3 class="toc-title">Index of stories</h3>
-        <p class="toc-desc">Browse all English retellings — more added gradually.</p>
-        <span class="card-read">
-          Open the index
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
-            <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </span>
-      </a>
+      <div class="story-card empty" aria-hidden="true">More stories — coming soon</div>
       <div class="story-card empty" aria-hidden="true">More stories — coming soon</div>
     </div>
   </section>
@@ -284,11 +279,17 @@ const featured = stories[0];
       letter-spacing: 0.25em;
       color: var(--ink-faint);
     }
+    .cta-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
     .cta {
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      margin-top: 36px;
       padding: 14px 32px;
       background: linear-gradient(180deg, var(--gold), var(--gold-deep));
       color: #1a1208;
@@ -302,14 +303,27 @@ const featured = stories[0];
       box-shadow:
         0 0 0 1px rgba(255, 220, 150, 0.4) inset,
         0 12px 30px rgba(212, 166, 74, 0.3);
-      transition: transform .3s, box-shadow .3s, background .3s;
+      transition: transform .3s, box-shadow .3s, background .3s, color .3s;
     }
     .cta:hover {
       transform: translateY(-2px);
       background: linear-gradient(180deg, var(--gold-bright), var(--gold));
     }
     .cta svg { transition: transform .3s; }
-    .cta:hover svg { transform: translateY(3px); }
+    .cta:hover svg { transform: translateX(4px); }
+
+    .cta-ghost {
+      background: transparent;
+      color: var(--ink-dim);
+      border: 1px solid rgba(212, 166, 74, 0.35);
+      box-shadow: none;
+    }
+    .cta-ghost:hover {
+      background: rgba(212, 166, 74, 0.08);
+      color: var(--gold);
+      border-color: var(--gold);
+      box-shadow: none;
+    }
 
     .scroll-hint {
       position: absolute;

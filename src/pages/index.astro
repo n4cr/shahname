@@ -50,12 +50,17 @@ const featured = stories[0];
         <span class="src">سرآغازِ شاهنامه</span>
       </p>
 
-      <a class="cta" href="#stories">
-        آغاز خواندن
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
-          <path d="M12 5v14M5 12l7 7 7-7" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </a>
+      <div class="cta-row">
+        <a class="cta" href={u("/stories")}>
+          فهرستِ کامل
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </a>
+        <a class="cta cta-ghost" href="#stories">
+          گزیدهٔ داستان‌ها
+        </a>
+      </div>
     </div>
 
     <div class="scroll-hint" aria-hidden="true">از کتاب</div>
@@ -109,18 +114,7 @@ const featured = stories[0];
         </a>
       )}
 
-      <a class="story-card toc-card" href={u("/stories")}>
-        <div class="toc-icon" aria-hidden="true">📜</div>
-        <h3 class="toc-title">فهرستِ کامل</h3>
-        <p class="toc-desc">۶۷۹ داستانِ شاهنامه — هر بیت، در اصلِ پارسی</p>
-        <span class="card-read">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
-            <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-          مرورِ فهرست
-        </span>
-      </a>
-
+      <div class="story-card empty" aria-hidden="true">داستان‌های بیشتر، به‌زودی…</div>
       <div class="story-card empty" aria-hidden="true">داستان‌های بیشتر، به‌زودی…</div>
     </div>
   </section>
@@ -289,11 +283,17 @@ const featured = stories[0];
       color: var(--ink-faint);
     }
 
+    .cta-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
     .cta {
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      margin-top: 36px;
       padding: 14px 32px;
       background: linear-gradient(180deg, var(--gold), var(--gold-deep));
       color: #1a1208;
@@ -307,7 +307,7 @@ const featured = stories[0];
         0 0 0 1px rgba(255, 220, 150, 0.4) inset,
         0 12px 30px rgba(212, 166, 74, 0.3),
         0 0 40px rgba(212, 166, 74, 0.2);
-      transition: transform .3s ease, box-shadow .3s ease, background .3s ease;
+      transition: transform .3s ease, box-shadow .3s ease, background .3s ease, color .3s ease;
     }
     .cta:hover {
       transform: translateY(-2px);
@@ -318,7 +318,20 @@ const featured = stories[0];
         0 0 60px rgba(232, 192, 113, 0.35);
     }
     .cta svg { transition: transform .3s ease; }
-    .cta:hover svg { transform: translateY(3px); }
+    .cta:hover svg { transform: translateX(-4px); }
+
+    .cta-ghost {
+      background: transparent;
+      color: var(--ink-dim);
+      border: 1px solid rgba(212, 166, 74, 0.35);
+      box-shadow: none;
+    }
+    .cta-ghost:hover {
+      background: rgba(212, 166, 74, 0.08);
+      color: var(--gold);
+      border-color: var(--gold);
+      box-shadow: none;
+    }
 
     .scroll-hint {
       position: absolute;
