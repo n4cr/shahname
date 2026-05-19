@@ -28,8 +28,12 @@ interface Section {
   items: Item[];
 }
 
-/** ≥ this many TOC dots → top-level kingdom entry (king name). */
-const DOTS_THRESHOLD = 110;
+/**
+ * ≥ this many TOC dots → section header. The natural gap in the
+ * printed TOC sits between sub-headings (≤99 dots) and kingdom/chapter
+ * entries (≥101 dots), so 100 cleanly splits them.
+ */
+const DOTS_THRESHOLD = 100;
 /** Detect duplicate reigns by comparing the first noun after "پادشاهی". */
 const kingOf = (title: string): string =>
   title.replace(/^پادشاهی\s*/, "").trim().split(/\s+/)[0] ?? "";
