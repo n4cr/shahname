@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
+import { u } from "../../lib/url";
 
 const stories = (await getCollection("stories")).sort(
   (a, b) => a.data.order - b.data.order,
@@ -12,14 +13,14 @@ const featured = stories[0];
   title="Shahnameh — The Persian Book of Kings, by Ferdowsi"
   description="The great Persian epic by Hakim Abolqasem Ferdowsi — original verse alongside an accessible retelling, in Persian and English."
   lang="en"
-  altLangHref="/"
+  altLangHref={u("/")}
 >
   <!-- HERO -->
   <section class="hero">
     <div class="hero-portrait">
       <figure>
         <img
-          src="/images/cover-ferdowsi-ref.png"
+          src={u("/images/cover-ferdowsi-ref.png")}
           alt="A painted portrait of the great Persian epic poet in classical miniature style"
         />
       </figure>
@@ -84,10 +85,10 @@ const featured = stories[0];
 
     <div class="story-grid">
       {featured && (
-        <a class="story-card" href={`/en/stories/${featured.data.slug}`}>
+        <a class="story-card" href={u(`/en/stories/${featured.data.slug}`)}>
           {featured.data.hero && (
             <div class="card-image">
-              <img src={featured.data.hero.src} alt={featured.data.hero.alt.en} loading="lazy" />
+              <img src={u(featured.data.hero.src)} alt={featured.data.hero.alt.en} loading="lazy" />
             </div>
           )}
           <div class="card-body">

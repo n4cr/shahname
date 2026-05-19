@@ -1,11 +1,11 @@
 import { defineConfig } from "astro/config";
 
-// When you buy the domain, update `site` to your final URL.
-// If you ever host at username.github.io/shahnameh instead of a custom
-// domain, also set `base: "/shahnameh"`.
+// Hosted on GitHub Pages at n4cr.github.io/shahname for now.
+// When the custom domain is ready: set `site` to that URL, set `base: "/"`,
+// and add a `public/CNAME` file containing the bare domain.
 export default defineConfig({
-  site: "https://shahnameh.example.com",
-  base: "/",
+  site: "https://n4cr.github.io",
+  base: "/shahname",
   trailingSlash: "never",
   i18n: {
     locales: ["fa", "en"],

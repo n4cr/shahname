@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Base from "../layouts/Base.astro";
+import { u } from "../lib/url";
 
 const stories = (await getCollection("stories")).sort(
   (a, b) => a.data.order - b.data.order,
@@ -12,14 +13,14 @@ const featured = stories[0];
   title="شاهنامه — حکیم ابوالقاسم فردوسی طوسی"
   description="حماسه‌ی ایران‌زمین، اثرِ حکیم فردوسی — متنِ اصلی به همراهِ روایتِ روان و نگارگری."
   lang="fa"
-  altLangHref="/en"
+  altLangHref={u("/en")}
 >
   <!-- HERO -->
   <section class="hero">
     <div class="hero-portrait">
       <figure>
         <img
-          src="/images/cover-ferdowsi-ref.png"
+          src={u("/images/cover-ferdowsi-ref.png")}
           alt="نگاره‌ای از حکیم سخن‌سرای پارسی به سبک نگارگری ایرانی"
         />
       </figure>
@@ -85,10 +86,10 @@ const featured = stories[0];
 
     <div class="story-grid">
       {featured && (
-        <a class="story-card" href={`/stories/${featured.data.slug}`}>
+        <a class="story-card" href={u(`/stories/${featured.data.slug}`)}>
           {featured.data.hero && (
             <div class="card-image">
-              <img src={featured.data.hero.src} alt={featured.data.hero.alt.fa} loading="lazy" />
+              <img src={u(featured.data.hero.src)} alt={featured.data.hero.alt.fa} loading="lazy" />
             </div>
           )}
           <div class="card-body">

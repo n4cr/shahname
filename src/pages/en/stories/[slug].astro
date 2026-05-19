@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import Base from "../../../layouts/Base.astro";
 import { parseVerses } from "../../../lib/poem";
+import { u } from "../../../lib/url";
 
 export async function getStaticPaths() {
   const stories = await getCollection("stories");
@@ -31,11 +32,11 @@ function applyEmphasis(s: string): string {
   title={`${d.title.en} — Shahnameh`}
   description={d.subtitle.en}
   lang="en"
-  altLangHref={`/stories/${d.slug}`}
+  altLangHref={u(`/stories/${d.slug}`)}
 >
   <div class="page">
     <nav class="top-nav" aria-label="Navigation">
-      <a class="back" href="/en">
+      <a class="back" href={u("/en")}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="14" height="14" aria-hidden="true">
           <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
@@ -53,7 +54,7 @@ function applyEmphasis(s: string): string {
 
     {d.hero && (
       <figure class="illumination">
-        <img src={d.hero.src} alt={d.hero.alt.en} loading="lazy" />
+        <img src={u(d.hero.src)} alt={d.hero.alt.en} loading="lazy" />
         <figcaption>{d.hero.caption.en}</figcaption>
       </figure>
     )}
