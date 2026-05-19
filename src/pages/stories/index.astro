@@ -19,6 +19,7 @@ interface Item {
   id: string;
   title: string;
   isHighlighted: boolean;
+  hasVerses: boolean;
 }
 interface Section {
   anchor: string;
@@ -27,39 +28,47 @@ interface Section {
   items: Item[];
 }
 
-const sections: Section[] = [];
-let current: Section | null = null;
+/** ≥ this many TOC dots → top-level kingdom entry (king name). */
+const DOTS_THRESHOLD = 110;
+/** Detect duplicate reigns by comparing the first noun after "پادشاهی". */
+const kingOf = (title: string): string =>
+  title.replace(/^پادشاهی\s*/, "").trim().split(/\s+/)[0] ?? "";
 
-sources.forEach((src) => {
+const sections: Section[] = [];
+
+sources.forEach((src, i) => {
   const tocEntry = toc[parseInt(src.id, 10) - 1];
   const title = tocEntry?.title?.trim() || src.rawTitle;
   const hasVerses = src.versesFa.trim().length > 0;
-  const item: Item = {
-    id: src.id,
-    title,
-    isHighlighted: highlightIds.has(src.id),
-  };
-  // An entry with no verses (just a heading in the source PDF) opens a new section
-  if (!hasVerses) {
-    current = {
+  const isReign = title.startsWith("پادشاهی");
+  const isHighLevel = src.tocDots >= DOTS_THRESHOLD;
+
+  let startsSection = false;
+  if (i === 0) {
+    startsSection = true;
+  } else if (isHighLevel) {
+    startsSection = true;
+  } else if (isReign) {
+    const last = sections[sections.length - 1];
+    const prevWasJustStarted = last && last.items.length === 0;
+    const sameKingAsCurrent = last && kingOf(last.title) === kingOf(title);
+    if (!prevWasJustStarted && !sameKingAsCurrent) startsSection = true;
+  }
+
+  if (startsSection) {
+    sections.push({
       anchor: `s-${src.id}`,
       title,
       startId: src.id,
       items: [],
-    };
-    sections.push(current);
+    });
   } else {
-    if (!current) {
-      // Shouldn't happen with the current data but guard anyway
-      current = {
-        anchor: `s-${src.id}`,
-        title,
-        startId: src.id,
-        items: [],
-      };
-      sections.push(current);
-    }
-    current.items.push(item);
+    sections[sections.length - 1]?.items.push({
+      id: src.id,
+      title,
+      isHighlighted: highlightIds.has(src.id),
+      hasVerses,
+    });
   }
 });
 
@@ -135,7 +144,7 @@ const highlightedCount = sources.filter((s) =>
               <ol class="story-list">
                 {s.items.map((it) => (
                   <li
-                    class={`story-item${it.isHighlighted ? " is-highlight" : ""}`}
+                    class={`story-item${it.isHighlighted ? " is-highlight" : ""}${!it.hasVerses ? " is-subheading" : ""}`}
                     data-title={it.title}
                     data-section={s.anchor}
                   >
@@ -476,6 +485,12 @@ const highlightedCount = sources.filter((s) =>
     .story-item.is-highlight {
       background: linear-gradient(90deg, rgba(212, 166, 74, 0.04), transparent 80%);
     }
+    .story-item.is-subheading .title {
+      color: var(--ink-faint);
+      font-style: italic;
+      font-size: 16px;
+    }
+    .story-item.is-subheading .num { opacity: 0.55; }
 
     footer {
       margin-top: 80px;
