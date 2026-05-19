@@ -1,0 +1,188 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../../layouts/Base.astro";
+import { u } from "../../../lib/url";
+
+const all = await getCollection("stories");
+const english = all
+  .filter((e) => e.data.prose.en && e.data.prose.en.length > 0)
+  .sort((a, b) => a.data.order - b.data.order);
+---
+
+<Base
+  title="Shahnameh — Index of stories"
+  description="Stories from Ferdowsi's Shahnameh available in English."
+  lang="en"
+  altLangHref={u("/stories")}
+>
+  <div class="page">
+    <nav class="top-nav" aria-label="Navigation">
+      <a class="back" href={u("/en")}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="14" height="14" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span>Shahnameh</span>
+      </a>
+    </nav>
+
+    <header class="toc-head">
+      <div class="kicker">INDEX OF STORIES</div>
+      <h1>Stories in English</h1>
+      <p class="lead">
+        Of the {/* count is added inline below */}<b>679</b> stories in
+        Ferdowsi's <i>Shahnameh</i>, <b>{english.length}</b> have an English
+        retelling here. More are added gradually. The full Persian original is
+        always available — see <a href={u("/stories")}>the Persian index</a>.
+      </p>
+    </header>
+
+    {english.length === 0 ? (
+      <p class="empty">No English retellings have been added yet.</p>
+    ) : (
+      <ol class="toc">
+        {english.map((e) => (
+          <li class="toc-item">
+            <a href={u(`/en/stories/${e.id}`)}>
+              <span class="num">{e.id}</span>
+              <span class="title">
+                <span class="en">{e.data.title.en ?? e.data.title.fa}</span>
+                {e.data.subtitle?.en && (
+                  <span class="sub">{e.data.subtitle.en}</span>
+                )}
+              </span>
+              <span class="mark" aria-hidden="true">→</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    )}
+
+    <footer>
+      <div class="colophon">In memory of Ferdowsi, who kept the Persian tongue alive</div>
+    </footer>
+  </div>
+
+  <style>
+    .page { max-width: 980px; margin: 0 auto; padding: 60px 24px 120px; }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      margin-bottom: 24px;
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 12px;
+      color: var(--ink-faint);
+    }
+    .top-nav .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-dim);
+      text-decoration: none;
+      padding: 6px 12px;
+      border: 1px solid rgba(212, 166, 74, 0.25);
+      border-radius: 999px;
+      font-family: Georgia, serif;
+      font-style: italic;
+    }
+    .top-nav .back:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+      background: rgba(212, 166, 74, 0.08);
+    }
+
+    .toc-head { text-align: center; padding: 32px 0 56px; }
+    .toc-head .kicker {
+      font-family: "Vazirmatn", sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      color: var(--gold-deep);
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .toc-head h1 {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: clamp(40px, 5vw, 56px);
+      color: var(--gold);
+      margin: 0;
+      font-weight: 400;
+    }
+    .toc-head .lead {
+      max-width: 60ch;
+      margin: 24px auto 0;
+      font-family: Georgia, serif;
+      font-size: 17px;
+      color: var(--ink-dim);
+      line-height: 1.8;
+    }
+    .toc-head .lead b { color: var(--gold); font-weight: 700; }
+    .toc-head .lead a { color: var(--gold); }
+
+    .empty {
+      text-align: center;
+      font-family: Georgia, serif;
+      font-style: italic;
+      color: var(--ink-faint);
+    }
+
+    .toc {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border-top: 1px solid var(--rule);
+    }
+    .toc-item { border-bottom: 1px solid rgba(212, 166, 74, 0.12); }
+    .toc-item a {
+      display: grid;
+      grid-template-columns: 56px 1fr 24px;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      text-decoration: none;
+      color: var(--ink);
+      transition: background .2s, color .2s;
+    }
+    .toc-item a:hover {
+      background: rgba(212, 166, 74, 0.05);
+      color: var(--gold-bright);
+    }
+    .num {
+      font-family: "Vazirmatn", sans-serif;
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--ink-faint);
+      text-align: center;
+    }
+    .title { display: flex; flex-direction: column; gap: 2px; }
+    .title .en {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 19px;
+      color: var(--gold);
+    }
+    .title .sub {
+      font-family: Georgia, serif;
+      font-size: 14px;
+      color: var(--ink-faint);
+    }
+    .mark { color: var(--gold); font-size: 18px; text-align: center; transition: transform .2s; }
+    .toc-item a:hover .mark { transform: translateX(4px); }
+
+    footer {
+      margin-top: 80px;
+      text-align: center;
+      color: var(--ink-faint);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .colophon {
+      font-family: Georgia, serif;
+      color: var(--ink-dim);
+      font-size: 17px;
+    }
+  </style>
+</Base>

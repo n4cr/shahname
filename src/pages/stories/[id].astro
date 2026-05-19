@@ -2,26 +2,42 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import { parseVerses } from "../../lib/poem";
+import { loadAllSources, loadSource } from "../../lib/sources";
 import { u } from "../../lib/url";
 
 export async function getStaticPaths() {
-  const stories = await getCollection("stories");
-  return stories.map((entry) => ({
-    params: { slug: entry.data.slug },
-    props: { entry },
+  const sources = loadAllSources();
+  const highlightsById = new Map<string, CollectionEntry<"stories">>();
+  for (const h of await getCollection("stories")) {
+    highlightsById.set(h.id, h);
+  }
+  return sources.map((src) => ({
+    params: { id: src.id },
+    props: { source: src, highlight: highlightsById.get(src.id) ?? null },
   }));
 }
 
 interface Props {
-  entry: CollectionEntry<"stories">;
+  source: ReturnType<typeof loadSource> & object;
+  highlight: CollectionEntry<"stories"> | null;
 }
 
-const { entry } = Astro.props;
-const d = entry.data;
-const stanzas = parseVerses(d.versesFa);
+const { source, highlight } = Astro.props;
+const h = highlight?.data ?? null;
+
+// Title and chapter label come from the highlight if present, otherwise
+// fall back to whatever we can derive from the source file.
+const chapterFa = h?.chapter.fa ?? `داستان ${source.id}`;
+const titleFa = h?.title.fa ?? source.rawTitle;
+const subtitleFa = h?.subtitle?.fa;
+
+// Verses: prefer the cleaned text from the highlight YAML, fall back to raw .txt
+const stanzas = parseVerses(h?.versesFa ?? source.versesFa);
+const hasVerses = stanzas.length > 0;
+const hasProse = (h?.prose.fa.length ?? 0) > 0;
+const hasEnglish = !!h?.prose.en && h.prose.en.length > 0;
 
 function applyEmphasis(s: string): string {
-  // Render *…* as gold-emphasized spans (Persian and English content)
   return s.replace(
     /\*([^*]+)\*/g,
     (_, t) => `<em class="em">${t}</em>`,
@@ -30,10 +46,10 @@ function applyEmphasis(s: string): string {
 ---
 
 <Base
-  title={`${d.title.fa} — شاهنامه`}
-  description={d.subtitle.fa}
+  title={`${titleFa} — شاهنامه`}
+  description={subtitleFa}
   lang="fa"
-  altLangHref={u(`/en/stories/${d.slug}`)}
+  altLangHref={hasEnglish ? u(`/en/stories/${source.id}`) : undefined}
 >
   <div class="page">
     <nav class="top-nav" aria-label="پیمایش">
@@ -44,83 +60,105 @@ function applyEmphasis(s: string): string {
         <span>شاهنامه</span>
       </a>
       <span class="crumb-sep" aria-hidden="true">·</span>
-      <span class="crumb-author">حکیم فردوسی طوسی</span>
+      <a class="crumb-link" href={u("/stories")}>فهرستِ داستان‌ها</a>
     </nav>
 
     <section class="story-head">
-      <div class="chapter-num">{d.chapter.fa}</div>
-      <h1 class="story-title">{d.title.fa}</h1>
-      <div class="story-subtitle">{d.subtitle.fa}</div>
+      <div class="chapter-num">{chapterFa}</div>
+      <h1 class="story-title">{titleFa}</h1>
+      {subtitleFa && <div class="story-subtitle">{subtitleFa}</div>}
     </section>
 
-    {d.hero && (
+    {h?.hero && (
       <figure class="illumination">
-        <img src={u(d.hero.src)} alt={d.hero.alt.fa} loading="lazy" />
-        <figcaption>{d.hero.caption.fa}</figcaption>
+        <img src={u(h.hero.src)} alt={h.hero.alt.fa} loading="lazy" />
+        <figcaption>{h.hero.caption.fa}</figcaption>
       </figure>
     )}
 
-    <div class="view-switch" role="tablist">
-      <button type="button" data-view="narrative" class="is-active" role="tab" aria-selected="true">روایت روان</button>
-      <button type="button" data-view="verse" role="tab" aria-selected="false">شعر فردوسی</button>
-      <button type="button" data-view="english" role="tab" aria-selected="false">English</button>
-    </div>
-
-    <!-- NARRATIVE -->
-    <article class="panel is-active card" id="panel-narrative" role="tabpanel">
-      {d.cast.length > 0 && (
-        <div class="cast">
-          <h3>چهره‌های داستان</h3>
-          <dl>
-            {d.cast.map((c) => (
-              <>
-                <dt>{c.fa}</dt>
-                <dd>{c.roleFa}</dd>
-              </>
-            ))}
-          </dl>
-        </div>
-      )}
-      <div class="prose">
-        {d.prose.fa.map((p, i) =>
-          p === "::quote::" && d.pullQuote ? (
-            <div class="pull">{d.pullQuote.fa}</div>
-          ) : (
-            <p class={i === 0 ? "lead" : ""} set:html={applyEmphasis(p)} />
-          ),
+    {hasProse && (
+      <div class="view-switch" role="tablist">
+        <button type="button" data-view="narrative" class="is-active" role="tab" aria-selected="true">روایت روان</button>
+        {hasVerses && (
+          <button type="button" data-view="verse" role="tab" aria-selected="false">شعر فردوسی</button>
+        )}
+        {hasEnglish && (
+          <button type="button" data-view="english" role="tab" aria-selected="false">English</button>
         )}
       </div>
-    </article>
+    )}
 
-    <!-- ENGLISH -->
-    <article class="panel card" id="panel-english" lang="en" dir="ltr" role="tabpanel" hidden>
-      <div class="prose en">
-        {d.prose.en.map((p, i) =>
-          p === "::quote::" && d.pullQuote ? (
-            <div class="pull">{d.pullQuote.en}</div>
-          ) : (
-            <p class={i === 0 ? "lead" : ""} set:html={applyEmphasis(p)} />
-          ),
-        )}
-      </div>
-    </article>
-
-    <!-- VERSE -->
-    <article class="panel card" id="panel-verse" role="tabpanel" hidden>
-      {stanzas.map((st, i) => (
-        <>
-          {i > 0 && <div class="section-break" aria-hidden="true">❖</div>}
-          <div class="stanza">
-            {st.couplets.map((c) => (
-              <>
-                <p class="mesra first">{c.first}</p>
-                <p class="mesra second">{c.second}</p>
-              </>
-            ))}
+    {hasProse && h && (
+      <article class="panel is-active card" id="panel-narrative" role="tabpanel">
+        {h.cast.length > 0 && (
+          <div class="cast">
+            <h3>چهره‌های داستان</h3>
+            <dl>
+              {h.cast.map((c) => (
+                <>
+                  <dt>{c.fa}</dt>
+                  <dd>{c.roleFa}</dd>
+                </>
+              ))}
+            </dl>
           </div>
-        </>
-      ))}
-    </article>
+        )}
+        <div class="prose">
+          {h.prose.fa.map((p, i) =>
+            p === "::quote::" && h.pullQuote ? (
+              <div class="pull">{h.pullQuote.fa}</div>
+            ) : (
+              <p class={i === 0 ? "lead" : ""} set:html={applyEmphasis(p)} />
+            ),
+          )}
+        </div>
+      </article>
+    )}
+
+    {hasProse && hasEnglish && h?.prose.en && (
+      <article class="panel card" id="panel-english" lang="en" dir="ltr" role="tabpanel" hidden>
+        <div class="prose en">
+          {h.prose.en.map((p, i) =>
+            p === "::quote::" && h.pullQuote?.en ? (
+              <div class="pull">{h.pullQuote.en}</div>
+            ) : (
+              <p class={i === 0 ? "lead" : ""} set:html={applyEmphasis(p)} />
+            ),
+          )}
+        </div>
+      </article>
+    )}
+
+    {hasVerses && (
+      <article
+        class={`panel card verse-panel${hasProse ? "" : " is-active no-tabs"}`}
+        id="panel-verse"
+        role="tabpanel"
+        hidden={hasProse}
+      >
+        {stanzas.map((st, i) => (
+          <>
+            {i > 0 && <div class="section-break" aria-hidden="true">❖</div>}
+            <div class="stanza">
+              {st.couplets.map((c) => (
+                <>
+                  <p class="mesra first">{c.first}</p>
+                  <p class="mesra second">{c.second}</p>
+                </>
+              ))}
+            </div>
+          </>
+        ))}
+      </article>
+    )}
+
+    {!hasVerses && !hasProse && (
+      <article class="card" style="text-align: center;">
+        <p style="color: var(--ink-faint); font-family: 'Amiri', serif;">
+          این بخش از کتاب در نسخه‌ی ما تنها به‌عنوان عنوان آمده است.
+        </p>
+      </article>
+    )}
 
     <footer>
       <div class="colophon">به یاد فردوسی، که زبان پارسی را زنده داشت</div>
@@ -128,44 +166,42 @@ function applyEmphasis(s: string): string {
     </footer>
   </div>
 
-  <script is:inline>
-    (function () {
-      const buttons = document.querySelectorAll(".view-switch button[data-view]");
-      const panels = {
-        narrative: document.getElementById("panel-narrative"),
-        verse: document.getElementById("panel-verse"),
-        english: document.getElementById("panel-english"),
-      };
-      function activate(view) {
+  {hasProse && (
+    <script is:inline>
+      (function () {
+        const buttons = document.querySelectorAll(".view-switch button[data-view]");
+        const panels = {
+          narrative: document.getElementById("panel-narrative"),
+          verse: document.getElementById("panel-verse"),
+          english: document.getElementById("panel-english"),
+        };
+        function activate(view) {
+          buttons.forEach(function (b) {
+            const on = b.dataset.view === view;
+            b.classList.toggle("is-active", on);
+            b.setAttribute("aria-selected", on ? "true" : "false");
+          });
+          Object.keys(panels).forEach(function (key) {
+            const el = panels[key];
+            if (!el) return;
+            const on = key === view;
+            el.classList.toggle("is-active", on);
+            if (on) el.removeAttribute("hidden");
+            else el.setAttribute("hidden", "");
+          });
+          try { history.replaceState(null, "", "#" + view); } catch (e) {}
+        }
         buttons.forEach(function (b) {
-          const on = b.dataset.view === view;
-          b.classList.toggle("is-active", on);
-          b.setAttribute("aria-selected", on ? "true" : "false");
+          b.addEventListener("click", function () { activate(b.dataset.view); });
         });
-        Object.keys(panels).forEach(function (key) {
-          const el = panels[key];
-          if (!el) return;
-          const on = key === view;
-          el.classList.toggle("is-active", on);
-          if (on) el.removeAttribute("hidden");
-          else el.setAttribute("hidden", "");
-        });
-        try { history.replaceState(null, "", "#" + view); } catch (e) {}
-      }
-      buttons.forEach(function (b) {
-        b.addEventListener("click", function () { activate(b.dataset.view); });
-      });
-      const initial = (location.hash || "").replace("#", "");
-      if (initial in panels) activate(initial);
-    })();
-  </script>
+        const initial = (location.hash || "").replace("#", "");
+        if (initial in panels) activate(initial);
+      })();
+    </script>
+  )}
 
   <style>
-    .page {
-      max-width: 880px;
-      margin: 0 auto;
-      padding: 60px 24px 120px;
-    }
+    .page { max-width: 880px; margin: 0 auto; padding: 60px 24px 120px; }
 
     .top-nav {
       display: flex;
@@ -177,7 +213,7 @@ function applyEmphasis(s: string): string {
       font-size: 13px;
       color: var(--ink-faint);
     }
-    .top-nav .back {
+    .top-nav .back, .top-nav .crumb-link {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -188,18 +224,15 @@ function applyEmphasis(s: string): string {
       border-radius: 999px;
       transition: color .2s, border-color .2s, background .2s;
     }
-    .top-nav .back:hover {
+    .top-nav .back:hover, .top-nav .crumb-link:hover {
       color: var(--gold);
       border-color: var(--gold);
       background: rgba(212, 166, 74, 0.08);
     }
     .top-nav .back svg { transform: scaleX(-1); }
-    .top-nav .crumb-author { font-family: "Amiri", serif; }
+    .top-nav .crumb-sep { color: var(--ink-faint); }
 
-    .story-head {
-      text-align: center;
-      padding: 24px 0 8px;
-    }
+    .story-head { text-align: center; padding: 24px 0 8px; }
     .chapter-num {
       font-family: "Vazirmatn", sans-serif;
       font-size: 13px;
@@ -228,13 +261,10 @@ function applyEmphasis(s: string): string {
       padding: 14px;
       background: linear-gradient(180deg, rgba(212, 166, 74, 0.18), rgba(212, 166, 74, 0.05));
       border: 1px solid rgba(212, 166, 74, 0.35);
-      box-shadow:
-        0 0 0 1px rgba(212, 166, 74, 0.05) inset,
-        0 30px 80px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 0 0 1px rgba(212, 166, 74, 0.05) inset, 0 30px 80px rgba(0, 0, 0, 0.55);
       position: relative;
     }
-    .illumination::before,
-    .illumination::after {
+    .illumination::before, .illumination::after {
       content: "";
       position: absolute;
       width: 22px; height: 22px;
@@ -292,13 +322,10 @@ function applyEmphasis(s: string): string {
       padding: 48px clamp(16px, 5vw, 72px);
       background: linear-gradient(180deg, rgba(26, 29, 46, 0.6), rgba(20, 24, 42, 0.85));
       border: 1px solid rgba(212, 166, 74, 0.18);
-      box-shadow:
-        0 0 0 1px rgba(212, 166, 74, 0.05) inset,
-        0 20px 60px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 0 0 1px rgba(212, 166, 74, 0.05) inset, 0 20px 60px rgba(0, 0, 0, 0.5);
       position: relative;
     }
-    .card::before,
-    .card::after {
+    .card::before, .card::after {
       content: "";
       position: absolute;
       width: 36px; height: 36px;
@@ -381,6 +408,8 @@ function applyEmphasis(s: string): string {
       background: rgba(212, 166, 74, 0.04);
     }
 
+    .verse-panel.no-tabs { margin-top: 48px; }
+
     .stanza {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -415,8 +444,7 @@ function applyEmphasis(s: string): string {
       color: var(--gold);
       opacity: 0.7;
     }
-    .section-break::before,
-    .section-break::after {
+    .section-break::before, .section-break::after {
       content: "";
       width: 60px;
       height: 1px;

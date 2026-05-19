@@ -5,9 +5,13 @@ import { parseVerses } from "../../../lib/poem";
 import { u } from "../../../lib/url";
 
 export async function getStaticPaths() {
-  const stories = await getCollection("stories");
-  return stories.map((entry) => ({
-    params: { slug: entry.data.slug },
+  const all = await getCollection("stories");
+  // Only generate EN routes for highlights that actually have English prose
+  const englishReady = all.filter(
+    (e) => e.data.prose.en && e.data.prose.en.length > 0,
+  );
+  return englishReady.map((entry) => ({
+    params: { id: entry.id },
     props: { entry },
   }));
 }
@@ -18,6 +22,7 @@ interface Props {
 
 const { entry } = Astro.props;
 const d = entry.data;
+const enProse = d.prose.en ?? [];
 const stanzas = parseVerses(d.versesFa);
 
 function applyEmphasis(s: string): string {
@@ -29,10 +34,10 @@ function applyEmphasis(s: string): string {
 ---
 
 <Base
-  title={`${d.title.en} — Shahnameh`}
-  description={d.subtitle.en}
+  title={`${d.title.en ?? d.title.fa} — Shahnameh`}
+  description={d.subtitle?.en}
   lang="en"
-  altLangHref={u(`/stories/${d.slug}`)}
+  altLangHref={u(`/stories/${entry.id}`)}
 >
   <div class="page">
     <nav class="top-nav" aria-label="Navigation">
@@ -43,19 +48,19 @@ function applyEmphasis(s: string): string {
         <span>Shahnameh</span>
       </a>
       <span class="crumb-sep" aria-hidden="true">·</span>
-      <span class="crumb-author">Ferdowsi of Tus</span>
+      <a class="crumb-link" href={u("/en/stories")}>Index of stories</a>
     </nav>
 
     <section class="story-head">
-      <div class="chapter-num">{d.chapter.en.toUpperCase()}</div>
-      <h1 class="story-title">{d.title.en}</h1>
-      <div class="story-subtitle">{d.subtitle.en}</div>
+      <div class="chapter-num">{(d.chapter.en ?? d.chapter.fa).toUpperCase()}</div>
+      <h1 class="story-title">{d.title.en ?? d.title.fa}</h1>
+      {d.subtitle?.en && <div class="story-subtitle">{d.subtitle.en}</div>}
     </section>
 
     {d.hero && (
       <figure class="illumination">
-        <img src={u(d.hero.src)} alt={d.hero.alt.en} loading="lazy" />
-        <figcaption>{d.hero.caption.en}</figcaption>
+        <img src={u(d.hero.src)} alt={d.hero.alt.en ?? d.hero.alt.fa} loading="lazy" />
+        <figcaption>{d.hero.caption.en ?? d.hero.caption.fa}</figcaption>
       </figure>
     )}
 
@@ -65,11 +70,10 @@ function applyEmphasis(s: string): string {
       <button type="button" data-view="persian" role="tab" aria-selected="false">فارسی</button>
     </div>
 
-    <!-- STORY (English narrative) -->
     <article class="panel is-active card" id="panel-story" role="tabpanel">
       <div class="prose en">
-        {d.prose.en.map((p, i) =>
-          p === "::quote::" && d.pullQuote ? (
+        {enProse.map((p, i) =>
+          p === "::quote::" && d.pullQuote?.en ? (
             <div class="pull">{d.pullQuote.en}</div>
           ) : (
             <p class={i === 0 ? "lead" : ""} set:html={applyEmphasis(p)} />
@@ -78,7 +82,6 @@ function applyEmphasis(s: string): string {
       </div>
     </article>
 
-    <!-- PERSIAN narrative -->
     <article class="panel card" id="panel-persian" lang="fa" dir="rtl" role="tabpanel" hidden>
       {d.cast.length > 0 && (
         <div class="cast">
@@ -104,7 +107,6 @@ function applyEmphasis(s: string): string {
       </div>
     </article>
 
-    <!-- VERSE -->
     <article class="panel card" id="panel-verse" lang="fa" dir="rtl" role="tabpanel" hidden>
       {stanzas.map((st, i) => (
         <>
@@ -173,9 +175,8 @@ function applyEmphasis(s: string): string {
       font-family: "Vazirmatn", sans-serif;
       font-size: 12px;
       color: var(--ink-faint);
-      letter-spacing: 0.05em;
     }
-    .top-nav .back {
+    .top-nav .back, .top-nav .crumb-link {
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -186,14 +187,12 @@ function applyEmphasis(s: string): string {
       border-radius: 999px;
       font-family: Georgia, serif;
       font-style: italic;
-      transition: color .2s, border-color .2s, background .2s;
     }
-    .top-nav .back:hover {
+    .top-nav .back:hover, .top-nav .crumb-link:hover {
       color: var(--gold);
       border-color: var(--gold);
       background: rgba(212, 166, 74, 0.08);
     }
-    .top-nav .crumb-author { font-family: Georgia, serif; font-style: italic; }
 
     .story-head { text-align: center; padding: 24px 0 8px; }
     .chapter-num {
@@ -228,8 +227,7 @@ function applyEmphasis(s: string): string {
       box-shadow: 0 0 0 1px rgba(212, 166, 74, 0.05) inset, 0 30px 80px rgba(0, 0, 0, 0.55);
       position: relative;
     }
-    .illumination::before,
-    .illumination::after {
+    .illumination::before, .illumination::after {
       content: "";
       position: absolute;
       width: 22px; height: 22px;
@@ -269,7 +267,6 @@ function applyEmphasis(s: string): string {
       padding: 10px 22px;
       border-radius: 999px;
       cursor: pointer;
-      letter-spacing: 0.05em;
       transition: color .25s, background .25s;
     }
     .view-switch button:hover { color: var(--ink); }
@@ -290,8 +287,7 @@ function applyEmphasis(s: string): string {
       box-shadow: 0 0 0 1px rgba(212, 166, 74, 0.05) inset, 0 20px 60px rgba(0, 0, 0, 0.5);
       position: relative;
     }
-    .card::before,
-    .card::after {
+    .card::before, .card::after {
       content: "";
       position: absolute;
       width: 36px; height: 36px;
@@ -336,7 +332,6 @@ function applyEmphasis(s: string): string {
       line-height: 1.8;
       background: rgba(212, 166, 74, 0.04);
     }
-    .prose.fa + * .pull,
     .prose.fa .pull { font-family: "Amiri", serif; font-style: normal; }
 
     .cast {
@@ -397,8 +392,7 @@ function applyEmphasis(s: string): string {
       color: var(--gold);
       opacity: 0.7;
     }
-    .section-break::before,
-    .section-break::after {
+    .section-break::before, .section-break::after {
       content: "";
       width: 60px;
       height: 1px;
@@ -413,13 +407,13 @@ function applyEmphasis(s: string): string {
       font-size: 13px;
       line-height: 1.8;
     }
-    footer .colophon {
+    .colophon {
       font-family: Georgia, serif;
       color: var(--ink-dim);
       font-size: 17px;
       margin-bottom: 10px;
     }
-    footer .colophon-quote {
+    .colophon-quote {
       font-family: Georgia, serif;
       font-style: italic;
       font-size: 15px;

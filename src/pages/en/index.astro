@@ -3,9 +3,9 @@ import { getCollection } from "astro:content";
 import Base from "../../layouts/Base.astro";
 import { u } from "../../lib/url";
 
-const stories = (await getCollection("stories")).sort(
-  (a, b) => a.data.order - b.data.order,
-);
+const stories = (await getCollection("stories"))
+  .filter((s) => s.data.prose.en && s.data.prose.en.length > 0)
+  .sort((a, b) => a.data.order - b.data.order);
 const featured = stories[0];
 ---
 
@@ -85,17 +85,19 @@ const featured = stories[0];
 
     <div class="story-grid">
       {featured && (
-        <a class="story-card" href={u(`/en/stories/${featured.data.slug}`)}>
+        <a class="story-card" href={u(`/en/stories/${featured.id}`)}>
           {featured.data.hero && (
             <div class="card-image">
-              <img src={u(featured.data.hero.src)} alt={featured.data.hero.alt.en} loading="lazy" />
+              <img src={u(featured.data.hero.src)} alt={featured.data.hero.alt.en ?? featured.data.hero.alt.fa} loading="lazy" />
             </div>
           )}
           <div class="card-body">
-            <div class="card-chapter">{featured.data.chapter.en.toUpperCase()}</div>
-            <h3 class="card-title">{featured.data.title.en}</h3>
-            <div class="card-subtitle">{featured.data.subtitle.en}</div>
-            <p class="card-tease">{featured.data.prose.en[0]?.slice(0, 200) + "…"}</p>
+            <div class="card-chapter">{(featured.data.chapter.en ?? featured.data.chapter.fa).toUpperCase()}</div>
+            <h3 class="card-title">{featured.data.title.en ?? featured.data.title.fa}</h3>
+            {featured.data.subtitle?.en && (
+              <div class="card-subtitle">{featured.data.subtitle.en}</div>
+            )}
+            <p class="card-tease">{featured.data.prose.en?.[0]?.slice(0, 200) + "…"}</p>
             <span class="card-read">
               Read the story
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
@@ -105,7 +107,17 @@ const featured = stories[0];
           </div>
         </a>
       )}
-      <div class="story-card empty" aria-hidden="true">More stories — coming soon</div>
+      <a class="story-card toc-card" href={u("/en/stories")}>
+        <div class="toc-icon" aria-hidden="true">📜</div>
+        <h3 class="toc-title">Index of stories</h3>
+        <p class="toc-desc">Browse all English retellings — more added gradually.</p>
+        <span class="card-read">
+          Open the index
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+      </a>
       <div class="story-card empty" aria-hidden="true">More stories — coming soon</div>
     </div>
   </section>
@@ -483,6 +495,34 @@ const featured = stories[0];
       font-size: 16px;
     }
     .story-card.empty:hover { transform: none; border-color: rgba(212, 166, 74, 0.4); box-shadow: none; }
+
+    .toc-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 32px 24px;
+      min-height: 360px;
+    }
+    .toc-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.85; }
+    .toc-title {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 28px;
+      color: var(--gold);
+      margin: 0 0 12px;
+      line-height: 1.2;
+    }
+    .toc-desc {
+      font-family: Georgia, serif;
+      font-size: 15px;
+      color: var(--ink-dim);
+      line-height: 1.7;
+      margin: 0 0 22px;
+      max-width: 28ch;
+    }
 
     footer {
       text-align: center;

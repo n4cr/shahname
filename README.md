@@ -42,11 +42,33 @@ npm run build        # → dist/
 npm run preview
 ```
 
-## Add a new highlighted story
+## Coverage tiers
 
-1. Create `src/content/stories/{NNN}.yaml` (use `078.yaml` as a template)
-2. Add an illustration to `public/images/`
-3. Build — the story appears automatically at `/stories/{slug}` and `/en/stories/{slug}`
+Every story is on one of three tiers. URLs use the 3-digit id, e.g. `/stories/078`.
+
+| Tier | What's there | Where it appears | Effort to add |
+|---|---|---|---|
+| **Plain** | original verses only (from `stories/{id}.txt`) | FA only — `/stories/{id}` | 0 — automatic, all 679 already exist |
+| **FA highlight** | + Persian prose retelling, optional image, cast, pull quote | FA story tabs | one YAML + (optional) one image |
+| **Bilingual highlight** | + English prose | EN side appears at `/en/stories/{id}` | add `prose.en` to the same YAML |
+
+The full FA index at `/stories` lists every story, with a gold ◆ marker on the highlighted ones. The EN index at `/en/stories` lists only the bilingual ones.
+
+## Add a highlight
+
+1. Pick a story id (3-digit, e.g. `142`).
+2. (Optional, ~$0.10–0.30) Generate a hero illustration:
+   ```bash
+   .venv/bin/python generate_image.py 142   # writes public/images/142-*.png
+   ```
+3. Create `src/content/stories/142.yaml`. Use `078.yaml` as the template. Only these fields are required:
+   - `id`, `order`
+   - `chapter.num`, `chapter.fa`
+   - `title.fa`
+   - `prose.fa` (a list of paragraphs; use `"::quote::"` to mark where the pull quote sits inline)
+   - `versesFa` (paste a cleaned-up version of the original verses)
+4. To enable the English side, add `prose.en` (and ideally `title.en`, `chapter.en`).
+5. Push — both routes rebuild automatically.
 
 ## Deploy
 
